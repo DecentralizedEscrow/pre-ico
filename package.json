@@ -1,0 +1,10 @@
+{
+  "name": "des-pre-ico",
+  "version": "0.0.0",
+  "repository": "https://github.com/DecentralizedEscrow/pre-ico",
+  "author": "Max Taldykin",
+  "license": "MIT",
+  "devDependencies": {
+    "zeppelin-solidity": "1.2.0"
+  }
+}
