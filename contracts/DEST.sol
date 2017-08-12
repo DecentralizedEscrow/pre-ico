@@ -37,28 +37,33 @@ contract DEST  is StandardToken {
     return now >= START_TIMESTAMP;
   }
 
-
+  // Payments are not accepted after ICO is finished.
   function hasFinished() public constant returns (bool) {
-    return now > END_TIMESTAMP || ethCollected >= ETH_MAX_LIMIT;
+    return now > END_TIMESTAMP || ethCollected >= ETH_MIN_LIMIT;
   }
 
+  // Investors can move their tokens only after ico has successfully finished
+  function tokensAreLiquid() public constant returns (bool) {
+    return (ethCollected >= ETH_MIN_LIMIT && now >= END_TIMESTAMP)
+      || (ethCollected >= ETH_MAX_LIMIT);
+  }
 
-  function price(uint v) public constant returns (uint) {
+  function price(uint _v) public constant returns (uint) {
     return // poor man's binary search
-      v < 7
-        ? v < 3
-          ? v < 1
+      _v < 7 ether
+        ? _v < 3 ether
+          ? _v < 1 ether
             ? 1000
-            : v < 2 ? 1005 : 1010
-          : v < 4
+            : _v < 2 ether ? 1005 : 1010
+          : _v < 4 ether
             ? 1015
-            : v < 5 ? 1020 : 1030
-        : v < 14
-          ? v < 10
-            ? v < 9 ? 1040 : 1050
+            : _v < 5 ether ? 1020 : 1030
+        : _v < 14 ether
+          ? _v < 10 ether
+            ? _v < 9 ether ? 1040 : 1050
             : 1080
-          : v < 100
-            ? v < 20 ? 1110 : 1150
+          : _v < 100 ether
+            ? _v < 20 ether ? 1110 : 1150
             : 1200;
   }
 
@@ -73,10 +78,10 @@ contract DEST  is StandardToken {
     ethCollected += msg.value;
     ethInvested[msg.sender] += msg.value;
 
-    uint tokenValue = msg.value * price(msg.value);
-    balances[msg.sender] += tokenValue;
-    totalSupply += tokenValue;
-    Transfer(0x0, msg.sender, tokenValue);
+    uint _tokenValue = msg.value * price(msg.value);
+    balances[msg.sender] += _tokenValue;
+    totalSupply += _tokenValue;
+    Transfer(0x0, msg.sender, _tokenValue);
   }
 
 
@@ -87,9 +92,9 @@ contract DEST  is StandardToken {
 
     totalSupply -= balances[msg.sender];
     balances[msg.sender] = 0;
-    uint ethRefund = ethInvested[msg.sender];
+    uint _ethRefund = ethInvested[msg.sender];
     ethInvested[msg.sender] = 0;
-    msg.sender.transfer(ethRefund);
+    msg.sender.transfer(_ethRefund);
   }
 
 
@@ -104,6 +109,33 @@ contract DEST  is StandardToken {
     require(msg.sender == icoManager);
     require(balances[icoManager] == totalSupply);
     // all refunds are finised or all tokens are migrated
+  }
+
+
+
+  // ERC20 functions
+  // =========================
+
+  function transfer(address _to, uint _value) public returns (bool)
+  {
+    require(tokensAreLiquid());
+    return super.transfer(_to, _value);
+  }
+
+
+  function transferFrom(address _from, address _to, uint _value)
+    public returns (bool)
+  {
+    require(tokensAreLiquid());
+    return super.transferFrom(_from, _to, _value);
+  }
+
+
+  function approve(address _spender, uint _value)
+    public returns (bool)
+  {
+    require(tokensAreLiquid());
+    return super.approve(_spender, _value);
   }
 }
 
