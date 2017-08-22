@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script type="text/javascript"
+            src="https://cdn.rawgit.com/ethereum/web3.js/develop/dist/web3.min.js"></script>
+  </head>
+  <body>
+    <p><b>ICO address:</b>&nbsp;<span id="address"></span></p>
+    <p><b>ICO has started:</b>&nbsp;<span id="started"></span></p>
+    <p><b>ICO has finished:</b>&nbsp;<span id="finished"></span></p>
+    <p><b>ETH collected:</b>&nbsp;<span id="collected"></span></p>
+  <script>
+    var web3 = new Web3();
+    web3.setProvider(new web3.providers.HttpProvider("https://kovan.infura.io"));
+
+    var destAddr = "0x6c8d54f7ff0c3b83bc3db6dae85faa08a239f08a";
+    var destAbi = [
+      { "constant": true,
+        "inputs": [],
+        "name": "hasStarted",
+        "outputs": [ { "name": "", "type": "bool" } ],
+        "payable": false,
+        "type": "function"
+      },
+      { "constant": true,
+        "inputs": [],
+        "name": "hasFinished",
+        "outputs": [ { "name": "", "type": "bool" } ],
+        "payable": false,
+        "type": "function"
+      },
+      { "constant": true,
+        "inputs": [],
+        "name": "ethCollected",
+        "outputs": [ { "name": "", "type": "uint256" } ],
+        "payable": false,
+        "type": "function"
+      }
+    ];
+
+    var dest = web3.eth.contract(destAbi).at(destAddr);
+    var hasStarted = dest.hasStarted();
+    var hasFinished = dest.hasFinished();
+    var weiCollected = dest.ethCollected();
+    var ethCollected = web3.fromWei(weiCollected, 'ether')
+
+    document.getElementById("address").textContent = destAddr;
+    document.getElementById("started").textContent = hasStarted;
+    document.getElementById("finished").textContent = hasFinished;
+    document.getElementById("collected").textContent = ethCollected;
+
+  </script>
+  </body>
+</html>

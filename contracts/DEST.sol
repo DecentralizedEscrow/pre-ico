@@ -37,16 +37,19 @@ contract DEST  is StandardToken {
     return now >= START_TIMESTAMP;
   }
 
+
   // Payments are not accepted after ICO is finished.
   function hasFinished() public constant returns (bool) {
     return now > END_TIMESTAMP || ethCollected >= ETH_MIN_LIMIT;
   }
+
 
   // Investors can move their tokens only after ico has successfully finished
   function tokensAreLiquid() public constant returns (bool) {
     return (ethCollected >= ETH_MIN_LIMIT && now >= END_TIMESTAMP)
       || (ethCollected >= ETH_MAX_LIMIT);
   }
+
 
   function price(uint _v) public constant returns (uint) {
     return // poor man's binary search
