@@ -10,6 +10,7 @@
     <p><b>ICO has started:</b>&nbsp;<span id="started"></span></p>
     <p><b>ICO has finished:</b>&nbsp;<span id="finished"></span></p>
     <p><b>ETH collected:</b>&nbsp;<span id="collected"></span></p>
+    <p><b>DEST issued:</b>&nbsp;<span id="issued"></span></p>
   <script>
     var web3 = new Web3();
     web3.setProvider(new web3.providers.HttpProvider("https://kovan.infura.io"));
@@ -36,6 +37,13 @@
         "outputs": [ { "name": "", "type": "uint256" } ],
         "payable": false,
         "type": "function"
+      },
+      { "constant": true,
+        "inputs": [],
+        "name": "totalSupply",
+        "outputs": [ { "name": "", "type": "uint256" } ],
+        "payable": false,
+        "type": "function"
       }
     ];
 
@@ -44,11 +52,14 @@
     var hasFinished = dest.hasFinished();
     var weiCollected = dest.ethCollected();
     var ethCollected = web3.fromWei(weiCollected, 'ether')
+    var destIssued = dest.totalSupply();
+    destIssued = web3.fromWei(destIssued, 'ether')
 
     document.getElementById("address").textContent = destAddr;
     document.getElementById("started").textContent = hasStarted;
     document.getElementById("finished").textContent = hasFinished;
     document.getElementById("collected").textContent = ethCollected;
+    document.getElementById("issued").textContent = destIssued;
 
   </script>
   </body>
