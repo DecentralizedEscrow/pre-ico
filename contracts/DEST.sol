@@ -9,25 +9,24 @@ contract DEST  is StandardToken {
   // Constants
   // =========
 
-  string public name = "Decentralized Escrow Token";
-  string public symbol = "DEST";
-  uint   public decimals = 18;
+  string public constant name = "Decentralized Escrow Token";
+  string public constant symbol = "DEST";
+  uint   public constant decimals = 18;
 
-  uint constant ETH_MIN_LIMIT = 500 ether;
-  uint constant ETH_MAX_LIMIT = 1500 ether;
+  uint public constant ETH_MIN_LIMIT = 500 ether;
+  uint public constant ETH_MAX_LIMIT = 1500 ether;
 
-  uint constant START_TIMESTAMP = 1503824400; // 2017-08-27 09:00:00 UTC
-  uint constant END_TIMESTAMP   = 1506816000; // 2017-10-01 00:00:00 UTC
+  uint public constant START_TIMESTAMP = 1503824400; // 2017-08-27 09:00:00 UTC
+  uint public constant END_TIMESTAMP   = 1506816000; // 2017-10-01 00:00:00 UTC
 
-  address constant icoManager = 0xE7F7d6cBCdC1fE78F938Bfaca6eA49604cB58D33;
-  address constant wallet     = 0x51559EfC1AcC15bcAfc7E0C2fB440848C136A46B;
+  address public constant wallet     = 0x51559EfC1AcC15bcAfc7E0C2fB440848C136A46B;
 
 
   // State variables
   // ===============
 
   uint public ethCollected;
-  mapping (address=>uint) public ethInvested;
+  mapping (address=>uint) ethInvested;
 
 
   // Constant functions
@@ -40,7 +39,7 @@ contract DEST  is StandardToken {
 
   // Payments are not accepted after ICO is finished.
   function hasFinished() public constant returns (bool) {
-    return now > END_TIMESTAMP || ethCollected >= ETH_MIN_LIMIT;
+    return now >= END_TIMESTAMP || ethCollected >= ETH_MAX_LIMIT;
   }
 
 
@@ -90,7 +89,7 @@ contract DEST  is StandardToken {
 
   // Investors can get refund if ETH_MIN_LIMIT is not reached.
   function refund() public {
-    require(ethCollected < ETH_MIN_LIMIT && now > END_TIMESTAMP);
+    require(ethCollected < ETH_MIN_LIMIT && now >= END_TIMESTAMP);
     require(balances[msg.sender] > 0);
 
     totalSupply -= balances[msg.sender];
@@ -106,14 +105,6 @@ contract DEST  is StandardToken {
     require(ethCollected >= ETH_MIN_LIMIT);
     wallet.transfer(this.balance);
   }
-
-
-  function dispose() public {
-    require(msg.sender == icoManager);
-    require(balances[icoManager] == totalSupply);
-    // all refunds are finised or all tokens are migrated
-  }
-
 
 
   // ERC20 functions
@@ -141,4 +132,3 @@ contract DEST  is StandardToken {
     return super.approve(_spender, _value);
   }
 }
-

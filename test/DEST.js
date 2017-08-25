@@ -1,54 +1,58 @@
 
 const DEST = artifacts.require("./DEST.sol");
 
+
+async function timeTravelTo(tm) {
+  const currentTime = web3.eth.getBlock(web3.eth.blockNumber).timestamp;
+  await web3.currentProvider.send(
+    { jsonrpc: "2.0"
+    , method: "evm_increaseTime"
+    , params: [tm - currentTime]
+    , id: currentTime
+    });
+  await web3.currentProvider.send(
+    { jsonrpc: "2.0"
+    , method: "evm_mine"
+    , params: []
+    , id: tm
+    });
+}
+
 contract("DEST", () => {
 
   let ico;
 
-  it("should be able to create ICO", () =>
-    DEST.new().then(res => {
-      assert.isOk(res && res.address, "has invalid address");
-      ico = res;
-    })
-  );
+  it("should be able to create ICO", async () => {
+    ico = await DEST.new();
+    assert.isOk(ico && ico.address, "has invalid address");
+  });
 
-  const prices = [
-    {v: 0.1, p: 1000},
-    {v: 1.0, p: 1005},
-    {v: 1.1, p: 1005},
-    {v: 2.0, p: 1010},
-    {v: 2.1, p: 1010},
-    {v: 3.0, p: 1015},
-    {v: 3.1, p: 1015},
-    {v: 4.0, p: 1020},
-    {v: 4.1, p: 1020},
-    {v: 5.0, p: 1030},
-    {v: 5.1, p: 1030},
-    {v: 6.1, p: 1030},
-    {v: 7.0, p: 1040},
-    {v: 7.1, p: 1040},
-    {v: 8.1, p: 1040},
-    {v: 9.0, p: 1050},
-    {v: 9.1, p: 1050},
-    {v: 10.0, p: 1080},
-    {v: 10.1, p: 1080},
-    {v: 12.1, p: 1080},
-    {v: 14.0, p: 1110},
-    {v: 14.1, p: 1110},
-    {v: 18.1, p: 1110},
-    {v: 20.0, p: 1150},
-    {v: 20.1, p: 1150},
-    {v: 50.1, p: 1150},
-    {v: 100.0, p: 1200},
-    {v: 100.1, p: 1200},
-    {v: 200.1, p: 1200}
-  ];
 
-  prices.forEach(x =>
-    it("price for " + x.v + " ETH", () =>
-      ico.price.call(
-        web3.toWei(x.v, 'ether')
-      ).then(res => assert.equal(x.p, res.toFixed()))
-    )
-  );
+  it("should be able to sell DEST after ICO has started", async () => {
+    const startTime = ico.START_TIMESTAMP.call();
+    await timeTravelTo(startTime);
+    assert.isOk(await ico.hasStarted.call(), "ICO has started");
+
+    const addr = web3.eth.accounts[0];
+    await web3.eth.sendTransaction(
+      { to: ico.address
+      , from: addr
+      , value: web3.toWei(0.1, 'ether')
+      , gas: 111 * 1000
+      });
+    const balance = await ico.balanceOf.call(addr);
+    const destBalance = web3.fromWei(balance, 'ether').toFixed();
+    assert.equal(100, destBalance, "balance is updated");
+  });
+
+  // split into files
+  //   - running_ICO
+  //     - can pay
+  //     - constant functions
+  //   - failed_ICO
+  //     - chk refund
+  //   - successfull_ICO
+  //     - chk withdraw
+  //     - chk liquidity
+  //
 })
