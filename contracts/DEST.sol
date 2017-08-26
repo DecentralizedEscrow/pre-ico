@@ -1,5 +1,5 @@
 
-pragma solidity ^0.4.12;
+pragma solidity ^0.4.16;
 
 import "zeppelin-solidity/contracts/token/StandardToken.sol";
 
@@ -19,7 +19,7 @@ contract DEST  is StandardToken {
   uint public constant START_TIMESTAMP = 1503824400; // 2017-08-27 09:00:00 UTC
   uint public constant END_TIMESTAMP   = 1506816000; // 2017-10-01 00:00:00 UTC
 
-  address public constant wallet     = 0x51559EfC1AcC15bcAfc7E0C2fB440848C136A46B;
+  address public constant wallet = 0x51559EfC1AcC15bcAfc7E0C2fB440848C136A46B;
 
 
   // State variables

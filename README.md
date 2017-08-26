@@ -14,4 +14,6 @@ Contract features and presale parameters:
    - or when 1500 Eth is raised;
  - you can get your ether back if less than 500 Eth is raised;
  - bonus tokens are awarded for larger Eth amount in single transaction;
- - tokens transfer is frozen during presale.
+ - tokens transfers are frozen during presale.
+
+The contract is deployed to the mainnet at address [0xbbda1f5899f828735af87e890afc6449fb90de13](https://etherscan.io/address/0xbbda1f5899f828735af87e890afc6449fb90de13).
